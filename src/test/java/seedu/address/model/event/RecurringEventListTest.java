@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 import org.junit.jupiter.api.Test;
+import seedu.address.model.event.exceptions.EventConflictException;
 
 class RecurringEventListTest {
 
@@ -24,11 +25,6 @@ class RecurringEventListTest {
 
         public RecurringEventStub(String eventName, DayOfWeek day, LocalTime startTime, LocalTime endTime) {
             super(eventName, day, startTime, endTime);
-        }
-
-        @Override
-        public String toString() {
-            return this.getEventName();
         }
 
         public int compareTo(RecurringEvent recurringEvent2) {
@@ -56,7 +52,9 @@ class RecurringEventListTest {
         recurringEventList.insert(new RecurringEventStub("Invalid", DayOfWeek.MONDAY,
                 TWELVE_O_CLOCK_VALID.toLocalTime(), THREE_O_CLOCK_VALID.toLocalTime()));
 
-        assertEquals("Recurring Events\n1. Biking\n" + "2. Canoeing\n" + "3. Skiing\n", recurringEventList.toString());
+        assertEquals("Recurring Events\n" + "1. Biking on MONDAY from 14:00 to 15:00\n" +
+                "2. Canoeing on WEDNESDAY from 12:00 to 17:00\n" +
+                "3. Skiing on SATURDAY from 09:00 to 12:00\n", recurringEventList.toString());
     }
 
     @Test
@@ -76,8 +74,54 @@ class RecurringEventListTest {
         LocalDateTime startPeriod = MONDAY_SIX_O_CLOCK_VALID;
         LocalDateTime endPeriod = THURSDAY_TWELVE_O_CLOCK_VALID;
 
-        assertEquals("Biking\n" + "Canoeing\n",
+        assertEquals("Biking on MONDAY from 14:00 to 15:00\nCanoeing on WEDNESDAY from 12:00 to 17:00\n",
                 recurringEventList.listBetweenOccurrence(startPeriod, endPeriod));
     }
+
+
+    @Test
+    void testgetRecurringEvent() {
+        recurringEventList.insert(new RecurringEventStub("Biking", DayOfWeek.MONDAY,
+                TWO_O_CLOCK_VALID.toLocalTime(), THREE_O_CLOCK_VALID.toLocalTime()));
+
+        recurringEventList.insert(new RecurringEventStub("Canoeing", DayOfWeek.WEDNESDAY,
+                TWELVE_O_CLOCK_VALID.toLocalTime(), FIVE_O_CLOCK_VALID.toLocalTime()));
+
+        recurringEventList.insert(new RecurringEventStub("Skiing", DayOfWeek.SATURDAY,
+                NINE_O_CLOCK_VALID.toLocalTime(), TWELVE_O_CLOCK_VALID.toLocalTime()));
+
+        assertEquals("Biking on MONDAY from 14:00 to 15:00",
+                recurringEventList.getRecurringEvent(0).toString());
+
+        assertEquals("Canoeing on WEDNESDAY from 12:00 to 17:00",
+                recurringEventList.getRecurringEvent(1).toString());
+
+        assertEquals("Skiing on SATURDAY from 09:00 to 12:00",
+                recurringEventList.getRecurringEvent(2).toString());
+
+    }
+
+    @Test
+    void testEdit() {
+        RecurringEvent event = new RecurringEventStub("Skiing", DayOfWeek.WEDNESDAY,
+                TWO_O_CLOCK_VALID.toLocalTime(), THREE_O_CLOCK_VALID.toLocalTime());
+        recurringEventList.insert(event);
+        RecurringEvent editedEvent = new RecurringEventStub("Skiing", DayOfWeek.MONDAY,
+                TWO_O_CLOCK_VALID.toLocalTime(), FIVE_O_CLOCK_VALID.toLocalTime());
+        recurringEventList.edit(event, editedEvent);
+        assertEquals(recurringEventList.getRecurringEvent(0).toString(), editedEvent.toString());
+    }
+
+//    @Test
+//    void checkOverlapping_throwsEventConflictException() {
+//        recurringEventList.insert(new RecurringEventStub(("Biking", DayOfWeek.MONDAY, TWO_O_CLOCK_VALID,
+//                THREE_O_CLOCK_VALID));
+//        isolatedEventList.insert(new IsolatedEventListTest.IsolatedEventStub("Skiing", TWO_O_CLOCK_VALID,
+//                THREE_O_CLOCK_VALID));
+//        isolatedEventList.insert(new IsolatedEventListTest.IsolatedEventStub("Canoeing", TWO_O_CLOCK_VALID,
+//                THREE_O_CLOCK_VALID));
+//        IsolatedEventListTest.IsolatedEventStub event = new IsolatedEventListTest.IsolatedEventStub("Biking", TWO_O_CLOCK_VALID, THREE_O_CLOCK_VALID);
+//        assertThrows(EventConflictException.class, () -> isolatedEventList.checkOverlapping(event, 1));
+//    }
 
 }
