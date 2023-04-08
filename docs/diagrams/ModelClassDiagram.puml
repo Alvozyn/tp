@@ -21,7 +21,8 @@ Class Phone
 Class Tag
 Class Group
 Class UniqueGroupList
-
+Class IsolatedEventList
+Class RecurringEventList
 }
 
 Class HiddenOutside #FFFFFF
@@ -46,6 +47,9 @@ Person *--> Email
 Person *--> Address
 Person *--> "*" Tag
 Person *--> "*" Group
+Person *--> IsolatedEventList
+Person *--> RecurringEventList
+
 
 Name -[hidden]right-> Phone
 Phone -[hidden]right-> Address
