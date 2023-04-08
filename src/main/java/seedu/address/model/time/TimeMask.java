@@ -70,14 +70,23 @@ public class TimeMask {
 
             if (endTime < 0) {
                 endTime = LAST_HOUR_INDEX;
+                endIndex = getUpdatedEndDay(endIndex);
             }
 
             if (startIndex != endIndex) {
-                occupySlots(startIndex, startTime, endTime);
+                occupyMultipleDay(startIndex, endIndex, startTime);
                 occupySlots(endIndex, 0, endTime);
             } else {
                 occupySlots(startIndex, startTime, endTime);
             }
+        }
+    }
+
+    private int getUpdatedEndDay(int endIndex) {
+        if (endIndex == 0) {
+            return 6;
+        } else {
+            return endIndex - 1;
         }
     }
 
@@ -99,6 +108,21 @@ public class TimeMask {
         int startBits = Integer.parseInt("1".repeat(endHourIndex - startHourIndex + 1), 2);
         int mask = startBits << startHourIndex;
         weeklyOccupancy[dayIndex] = weeklyOccupancy[dayIndex] | mask;
+    }
+
+    private void occupyMultipleDay(int startDay, int endDay, int starHour) {
+        int curr = startDay;
+        int startBits = Integer.parseInt("1".repeat(23 - starHour + 1), 2);
+        int mask = startBits << starHour;
+        weeklyOccupancy[curr] = weeklyOccupancy[curr] | mask;
+        curr = curr == 6 ? 0 : curr+1;
+
+        while (curr < endDay) {
+            startBits = Integer.parseInt("1".repeat(24), 2);
+            mask = startBits << 0;
+            weeklyOccupancy[curr] = weeklyOccupancy[curr] | mask;
+            curr = curr == 6 ? 0 : curr + 1;
+        }
     }
 
     private void checkValidDayIndex(int dayIndex) {
